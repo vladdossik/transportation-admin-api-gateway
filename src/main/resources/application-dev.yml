@@ -1,0 +1,22 @@
+logging:
+  level:
+    root: INFO
+
+server:
+  port: 8098
+
+services:
+  user-service-url: http://localhost:8082/v1/
+
+
+  properties:
+    security:
+      protocol: PLAINTEXT
+    ssl:
+      key-password: null
+      key-store-location: /etc/config/ssl/mq.jks
+      key-store-password: null
+      key-store-type: JKS
+      trust-store-location: /etc/config/ssl/mq.jks
+      trust-store-password: null
+      trust-store-type: JKS

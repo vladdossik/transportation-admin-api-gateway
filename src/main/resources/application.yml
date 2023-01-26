@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: transportation-admin-api-gateway
+
+springdoc:
+  swagger-ui:
+    doc-expansion: none
+    default-model-rendering: model
+
+kafka:
+  properties:
+    api.timeout.ms: 5000
+    auto.commit.interval.ms: 100
+    enable.auto.commit: true
+    auto.offset.reset: earliest
+    ssl:
+      protocol: TLSv1.2
+
+cache:
+  ttl_in_minutes: 60
+  heap_in_mb: 256
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    enabled-by-default: true
+    web.exposure.include: '*'
+  endpoint:
+    info.enabled: true
+    health:
+      enabled: true
+      show-details: always
+    loggers.enabled: true
+    prometheus.enabled: true
+
+services:
+  user-service-url: http://localhost:8082/v1/
