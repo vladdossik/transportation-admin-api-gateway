@@ -19,6 +19,7 @@ import users.UserResponseDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("v1/users")
@@ -46,6 +47,53 @@ public class UserController {
                 .bodyToMono(UserResponseDto.class);
     }
 
+    @Operation(summary = "Получить список пользователей")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос выполнен успешно", content = @Content(schema = @Schema(implementation = UserPageResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Ошибочный запрос"),
+            @ApiResponse(responseCode = "409", description = "Запись уже существует"),
+            @ApiResponse(responseCode = "503", description = "Сервис временно недоступен")
+    })
+    @GetMapping("/all")
+    public Mono<UserPageResponse> getAll(
+            @RequestParam(defaultValue = "0") @Min(0) Integer pageNumber,
+            @RequestParam(defaultValue = "10") @Min(1) Integer pageSize,
+            @RequestParam(defaultValue = "creationDate") String sortBy,
+            @RequestParam String direction,
+            @RequestParam(required = false) String firstNameFilter,
+            @RequestParam(required = false) String lastNameFilter
+    ) {
+        return userServiceClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("users/all")
+                        .queryParam("pageNumber", pageNumber)
+                        .queryParam("pageSize", pageSize)
+                        .queryParam("sortBy", sortBy)
+                        .queryParam("direction", direction)
+                        .queryParam("firstNameFilter", firstNameFilter)
+                        .queryParam("lastNameFilter", lastNameFilter)
+                        .build())
+                .retrieve()
+                .bodyToMono(UserPageResponse.class);
+    }
+
+    @Operation(summary = "Получить пользователя по id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос выполнен успешно", content = @Content(schema = @Schema(implementation = UserResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Ошибочный запрос"),
+            @ApiResponse(responseCode = "409", description = "Запись уже существует"),
+            @ApiResponse(responseCode = "503", description = "Сервис временно недоступен")
+    })
+    @GetMapping("/{externalId}")
+    public Mono<UserResponseDto> getById(@PathVariable UUID externalId) {
+        return userServiceClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("users/{externalId}")
+                        .build(externalId))
+                .retrieve()
+                .bodyToMono(UserResponseDto.class);
+    }
+
     @Operation(summary = "Удалить пользователя по id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Запрос выполнен успешно", content = @Content(schema = @Schema(implementation = String.class))),
@@ -53,15 +101,31 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "Запись уже существует"),
             @ApiResponse(responseCode = "503", description = "Сервис временно недоступен")
     })
-    @DeleteMapping("/{id}/delete")
-    public Mono<Void> deleteById(@PathVariable Long id) {
+    @DeleteMapping("/{externalId}/delete")
+    public Mono<String> deleteById(@PathVariable UUID externalId) {
         return userServiceClient.delete()
                 .uri(uriBuilder -> uriBuilder
-                        .path("users/{id}/delete")
-                        .build(id))
-                .accept(MediaType.APPLICATION_JSON)
+                        .path("users/{externalId}/delete")
+                        .build(externalId))
                 .retrieve()
-                .bodyToMono(Void.class);
+                .bodyToMono(String.class);
+    }
+
+    @Operation(summary = "Удалить всех пользователей")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос выполнен успешно", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Ошибочный запрос"),
+            @ApiResponse(responseCode = "409", description = "Запись уже существует"),
+            @ApiResponse(responseCode = "503", description = "Сервис временно недоступен")
+    })
+    @DeleteMapping("/delete")
+    public Mono<String> deleteAll() {
+        return userServiceClient.delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path("users/delete")
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
     @Operation(summary = "Обновить данные пользователея")
@@ -71,15 +135,32 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "Запись уже существует"),
             @ApiResponse(responseCode = "503", description = "Сервис временно недоступен")
     })
-    @PutMapping("/{id}")
-    public Mono<UserPutDto> update(@PathVariable Long id, @Valid @RequestBody UserPutDto userDto) {
+    @PutMapping("/{externalId}")
+    public Mono<UserResponseDto> update(@PathVariable UUID externalId, @Valid @RequestBody UserPutDto userDto) {
         return userServiceClient.put()
                 .uri(uriBuilder -> uriBuilder
-                        .path("users/{id}")
-                        .build(id))
+                        .path("users/{externalId}")
+                        .build(externalId))
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(userDto))
                 .retrieve()
-                .bodyToMono(UserPutDto.class);
+                .bodyToMono(UserResponseDto.class);
+    }
+
+    @Operation(summary = "Востановить пользователя по id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос выполнен успешно", content = @Content(schema = @Schema(implementation = UserResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Ошибочный запрос"),
+            @ApiResponse(responseCode = "409", description = "Запись уже существует"),
+            @ApiResponse(responseCode = "503", description = "Сервис временно недоступен")
+    })
+    @PostMapping("/{externalId}")
+    public Mono<UserResponseDto> reestablish(@PathVariable UUID externalId) {
+        return userServiceClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("users/{externalId}")
+                        .build(externalId))
+                .retrieve()
+                .bodyToMono(UserResponseDto.class);
     }
 }

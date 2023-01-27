@@ -22,7 +22,7 @@
     <maven.compile.source>11</maven.compile.source>
     <maven.compile.target>11</maven.compile.target>
     <java.version>11</java.version>
-    <transporation-models.version>v.0.0.3</transporation-models.version>
+    <transporation-models.version>v.0.0.4</transporation-models.version>
 
   </properties>
 
