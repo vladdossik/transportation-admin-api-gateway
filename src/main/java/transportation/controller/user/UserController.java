@@ -1,4 +1,4 @@
-package transportation.controller;
+package transportation.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import pagination.SortOrder;
 import reactor.core.publisher.Mono;
 import users.UserPageResponse;
 import users.UserPostDto;
