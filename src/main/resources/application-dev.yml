@@ -7,6 +7,7 @@ server:
 
 services:
   user-service-url: http://localhost:8082/v1/
+  bills-service-url: http://localhost:8083/v1/
 
 
   properties:

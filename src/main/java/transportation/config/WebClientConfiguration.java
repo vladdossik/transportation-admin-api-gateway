@@ -27,6 +27,8 @@ import javax.annotation.PostConstruct;
 public class WebClientConfiguration implements WebFluxConfigurer {
     @Value("${services.user-service-url}")
     private String userServiceUrl;
+    @Value("${services.bills-service-url}")
+    private String billsServiceUrl;
 
     private final ObjectMapper mapper;
     private ExchangeStrategies exchangeStrategies;
@@ -53,6 +55,15 @@ public class WebClientConfiguration implements WebFluxConfigurer {
     public WebClient userServiceClient() {
         return WebClient.builder()
                 .baseUrl(userServiceUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .exchangeStrategies(exchangeStrategies)
+                .build();
+    }
+
+    @Bean
+    public WebClient billServiceClient() {
+        return WebClient.builder()
+                .baseUrl(billsServiceUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .exchangeStrategies(exchangeStrategies)
                 .build();
