@@ -19,6 +19,7 @@ kafka:
 cache:
   ttl_in_minutes: 60
   heap_in_mb: 256
+  users_cache : users
 
 management:
   server:

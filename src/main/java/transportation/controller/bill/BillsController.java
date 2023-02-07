@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import users.UserResponseDto;
-
+import transportation.service.UserService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.UUID;
@@ -27,7 +26,7 @@ import java.util.UUID;
 public class BillsController {
 
     private final WebClient billServiceClient;
-    private final WebClient userServiceClient;
+    private final UserService userService;
 
     @Operation(summary = "Добавить платеж")
     @ApiResponses(value = {
@@ -38,12 +37,7 @@ public class BillsController {
     })
     @PostMapping("/add")
     public Mono<BillResponseDto> add(@Valid @RequestBody BillPostDto billPostDto) {
-        return userServiceClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("users/{externalId}")
-                        .build(billPostDto.getUserId()))
-                .retrieve()
-                .bodyToMono(UserResponseDto.class)
+        return userService.getUser(billPostDto.getUserId())
                 .flatMap(result ->
                         billServiceClient.post()
                                 .uri(uriBuilder -> uriBuilder
